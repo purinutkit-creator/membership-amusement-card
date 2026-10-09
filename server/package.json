@@ -9,7 +9,7 @@
     "start": "node src/index.js",
     "migrate": "node src/db/migrate.js",
     "seed": "node src/db/seed.js",
-    "test": "node --test --test-concurrency=1 test/"
+    "test": "NODE_ENV=test node --test --test-concurrency=1 test/"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",
