@@ -144,7 +144,7 @@ export async function processTap({ device, machineId, cardIdentifier, requestId,
 
       // 13. allow play only after commit
       afterCommit(db, async () => {
-        await allowPlay(machine, { txnNo: txn.txn_no, cardId: card.id });
+        await allowPlay({ ...machine, config: device.config || {} }, { txnNo: txn.txn_no, cardId: card.id });
         emit(['staff', `card:${card.id}`, card.member_id && `member:${card.member_id}`], 'card:update', { cardId: card.id, balance: body.balance, points: body.points, stamps: body.stamps });
         emit(['staff'], 'txn:new', { type: 'PLAY', txnNo: txn.txn_no, amount: price, machineId: machine.id, branchId: machine.branch_id, at: txn.created_at });
       });

@@ -7,7 +7,7 @@ import { logger } from '../../lib/logger.js';
 
 export async function allowPlay(machine, payload) {
   emit([`machine:${machine.id}`], 'play:allow', { machineId: machine.id, credits: machine.credits_per_play, ...payload });
-  const url = machine.relay_url || machine.config?.relayUrl;
+  const url = machine.config?.relayUrl;
   if (url) {
     try {
       await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ credits: machine.credits_per_play, txn: payload.txnNo }) , signal: AbortSignal.timeout(3000) });

@@ -96,9 +96,15 @@ r.post('/orders/:id/pay', perm('pos.open'), async (req, res) => {
   res.json(out);
 });
 
-r.post('/orders/:id/void', perm('pos.void'), async (req, res) => {
+r.post('/orders/:id/void', perm('pos.open'), async (req, res) => {
   const b = parse(z.object({ reason: zReason, approval: z.any().optional() }), req.body);
-  await requireApproval(req.ctx, 'pos.void', b.approval);
+  // A cashier may abandon their own unpaid cart within 30 minutes; anything else is a real void.
+  const o = await one({ query }, 'SELECT staff_id, created_at, status FROM orders WHERE id = $1', [req.params.id]);
+  const ownFresh = o && o.status === 'PENDING_PAYMENT' && o.staff_id === req.ctx.staff.id && Date.now() - new Date(o.created_at).getTime() < 30 * 60000;
+  if (!ownFresh) {
+    if (!req.ctx.staff.permissions.has('pos.void')) throw fail('FORBIDDEN', undefined, { permission: 'pos.void' });
+    await requireApproval(req.ctx, 'pos.void', b.approval);
+  }
   res.json(await orders.cancelOrder(req.ctx, req.params.id, b.reason));
 });
 

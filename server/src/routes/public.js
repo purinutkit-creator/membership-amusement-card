@@ -43,6 +43,15 @@ r.get('/card-portal/:token', async (req, res) => {
   res.json({ valid: true, cardMasked: `********${c.card_number.slice(-4)}`, hasMember: !!c.member_id, status: c.status });
 });
 
+/** Media by id (approved only) — lets any surface render <img src="/api/public/media/:id">. */
+r.get('/media/:id', async (req, res) => {
+  if (!/^[0-9a-f-]{36}$/.test(req.params.id)) throw fail('NOT_FOUND');
+  const m = await one({ query }, `SELECT url FROM media WHERE id = $1 AND status = 'APPROVED'`, [req.params.id]);
+  if (!m) throw fail('NOT_FOUND');
+  res.setHeader('Cache-Control', 'public, max-age=300');
+  res.redirect(302, m.url);
+});
+
 r.get('/policies', async (_req, res) => res.json({ items: await many({ query }, `SELECT id, kind, version, title, content, published_at FROM privacy_policies WHERE status = 'PUBLISHED'`) }));
 
 /** Payment gateway webhook — signature-verified and idempotent. */

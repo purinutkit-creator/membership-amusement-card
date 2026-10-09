@@ -130,7 +130,8 @@ export async function publicSettings(branchId = null) {
     member: { fields: s.member.fields, customFields: s.member.customFields, otpEnabled: s.member.otpEnabled },
     stamp: { name: s.stamp.name, iconMediaId: s.stamp.iconMediaId, conversion: s.stamp.conversion },
     display: s.display, sound: s.sound, privacy: s.privacy,
-    card: { guestCardEnabled: s.card.guestCardEnabled, deposit: s.card.deposit },
+    card: { guestCardEnabled: s.card.guestCardEnabled, deposit: s.card.deposit, replacementFee: s.card.replacementFee, depositRefundable: s.card.depositRefundable },
+    receipt: { paperWidth: s.receipt.paperWidth, showLogo: s.receipt.showLogo },
     setup: { completed: s.setup.completed },
   };
 }
