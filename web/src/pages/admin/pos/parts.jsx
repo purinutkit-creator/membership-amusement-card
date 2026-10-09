@@ -80,11 +80,16 @@ export function MemberChip({ member, onClear }) {
 export function DisplayControl({ pairing }) {
   const [open, setOpen] = useState(false);
   const p = pairing.pairing;
+  const offline = pairing.paired && p?.displayOnline === false;
   return (
     <>
-      <Button size="sm" variant={pairing.paired ? 'success' : ''} icon={MonitorPlay} onClick={() => setOpen(true)}>{pairing.paired ? 'Display connected' : 'Connect Customer Display'}</Button>
+      <Button size="sm" variant={offline ? 'warning' : pairing.paired ? 'success' : ''} icon={MonitorPlay} onClick={() => { setOpen(true); pairing.reload(); }}>{offline ? 'Display offline' : pairing.paired ? 'Display connected' : 'Connect Customer Display'}</Button>
       <Modal open={open} title="Customer Display" onClose={() => setOpen(false)}>
-        {pairing.paired ? <div className="col"><div className="alert success">Customer display is paired with this POS session.</div><Button icon={Unplug} variant="danger" onClick={() => pairing.close()}>Disconnect display</Button></div>
+        {pairing.paired ? <div className="col">
+          {offline
+            ? <div className="alert warning">The display is paired but its screen is not open. Open <b>{location.origin}/display</b> on the display device (it reconnects automatically), or disconnect and pair again.</div>
+            : <div className="alert success">Customer display is paired with this POS session.</div>}
+          <Button icon={Unplug} variant="danger" onClick={() => pairing.close()}>Disconnect display</Button></div>
           : p?.status === 'WAITING' ? <div className="col center" style={{ alignItems: 'center' }}><div className="muted">On the customer display open <b>{location.origin}/display</b> and enter:</div><div className="giant mono" style={{ letterSpacing: '.2em' }}>{p.code}</div><div className="small muted">Code valid for 10 minutes</div><Button onClick={() => pairing.reload()}>Refresh status</Button></div>
             : <Button variant="primary" size="lg" icon={MonitorPlay} onClick={() => pairing.create()}>Generate pairing code</Button>}
       </Modal>

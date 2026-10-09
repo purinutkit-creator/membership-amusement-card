@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { AdminLangToggle } from '../../lib/adminI18n.jsx';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { LogIn, KeyRound, User } from 'lucide-react';
 import { useAuth } from '../../lib/auth.jsx';
@@ -49,6 +50,7 @@ export default function Login() {
             disabled={tab === 'pin' ? !f.employeeCode || f.pin.length < 4 : !f.username || !f.password}>Sign in</Button>
         </form>
         <div className="row between mt small"><Link to="/m"><User size={14} /> Member portal</Link><Link to="/terminal">Card terminal</Link><Link to="/display">Customer display</Link></div>
+        <div className="row center mt"><AdminLangToggle /></div>
       </div>
     </div>
   );

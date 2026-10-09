@@ -52,6 +52,7 @@ code, .mono { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; 
 .btn.accent { --b: var(--accent); --c: #111; border-color: transparent; }
 .btn.danger { --b: var(--danger); --c: #fff; border-color: transparent; }
 .btn.success { --b: var(--success); --c: #fff; border-color: transparent; }
+.btn.warning { --b: var(--warning); --c: #fff; border-color: transparent; }
 .btn.ghost { --b: transparent; border-color: transparent; }
 .btn.outline { --b: transparent; }
 .btn.sm { min-height: 34px; padding: 0 10px; font-size: .85rem; }

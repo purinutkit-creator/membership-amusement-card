@@ -16,7 +16,7 @@ import { createSession } from '../services/auth.js';
 import { getSettings } from '../services/settings.js';
 import { config } from '../config.js';
 import { paginate, where } from './_util.js';
-import { emit } from '../realtime.js';
+import { emit, getIO } from '../realtime.js';
 import { logger } from '../lib/logger.js';
 import rateLimit from 'express-rate-limit';
 
@@ -284,7 +284,13 @@ r.post('/pairings', requireStaff, perm('pos.open'), async (req, res) => {
   res.status(201).json(out);
 });
 r.get('/pairings/current', requireStaff, async (req, res) => {
-  res.json(await one({ query }, `SELECT id, code, status, expires_at, paired_at FROM device_pairings WHERE staff_id = $1 AND status IN ('WAITING','PAIRED') AND (status = 'PAIRED' OR expires_at > now()) ORDER BY created_at DESC LIMIT 1`, [req.ctx.staff.id]));
+  const p = await one({ query }, `SELECT id, code, status, expires_at, paired_at FROM device_pairings WHERE staff_id = $1 AND status IN ('WAITING','PAIRED') AND (status = 'PAIRED' OR expires_at > now()) ORDER BY created_at DESC LIMIT 1`, [req.ctx.staff.id]);
+  // "paired" is a DB fact; whether the display screen is actually open right now is socket presence
+  if (p?.status === 'PAIRED') {
+    const sockets = (await getIO()?.in(`pair:${p.id}`).fetchSockets()) || [];
+    p.displayOnline = sockets.some((s) => s.data.identity?.kind === 'display');
+  }
+  res.json(p);
 });
 r.post('/pairings/:id/close', requireStaff, async (req, res) => {
   const p = await one({ query }, `UPDATE device_pairings SET status = 'CLOSED', closed_at = now() WHERE id = $1 AND staff_id = $2 RETURNING *`, [req.params.id, req.ctx.staff.id]);

@@ -147,7 +147,7 @@ export function ReceiptView({ data, width = '80', reprint, showReprintLabel = tr
   const r = data;
   const publicUrl = `${location.origin}/r/${r.qrToken}`;
   return (
-    <div id={id} className={`receipt w${width}`}>
+    <div id={id} className={`receipt w${width}`} translate="no">
       <div className="rc-center">
         {logoUrl && <img src={logoUrl} alt="" style={{ maxHeight: 50, maxWidth: '70%' }} />}
         <div className="rc-big">{r.store?.name}</div>

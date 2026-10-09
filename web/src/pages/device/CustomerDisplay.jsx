@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { CheckCircle2, CreditCard, Delete, ShieldCheck, UserRound, XCircle, Loader2, MonitorSmartphone } from 'lucide-react';
 import { tokenClient } from '../../lib/api.js';
-import { useSocket } from '../../lib/realtime.js';
+import { useSocket, getSocket, closeSocket } from '../../lib/realtime.js';
 import { useKeyboardWedge, useCardReads } from '../../lib/readers.js';
 import { I18nProvider, useI18n, LANGS, ERROR_KEY } from '../../lib/i18n.jsx';
 import { applyTheme, applyFont } from '../../lib/theme.js';
@@ -54,7 +54,8 @@ function DisplayScreen({ me, onUnpair }) {
   const [local, setLocal] = useState(null); // local sub-screen: PRIVACY | PHONE_RESULT | CARD_RESULT
   const lastActivity = useRef(Date.now());
   const send = useCallback((type, value) => client.post('/display/input', { type, value }).catch(() => null), []);
-  useSocket({
+  const auth = { kind: 'display', token: localStorage.getItem(KEY) };
+  const live = useSocket({
     'display:state': (st) => {
       lastActivity.current = Date.now();
       setState((prev) => {
@@ -65,7 +66,15 @@ function DisplayScreen({ me, onUnpair }) {
       });
     },
     'pair:closed': () => onUnpair(),
-  }, { kind: 'display', token: localStorage.getItem(KEY) });
+  }, auth);
+  // the POS closed this pairing while we were away: go back to code entry instead of waiting forever
+  useEffect(() => {
+    const sock = getSocket(auth);
+    const onErr = (e) => { if (e?.message === 'DISPLAY_UNAUTHORIZED') onUnpair(); };
+    sock.on('connect_error', onErr);
+    return () => sock.off('connect_error', onErr);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth.token]);
 
   // session timeout: no POS activity for N seconds while in a customer session
   useEffect(() => {
@@ -118,6 +127,7 @@ function DisplayScreen({ me, onUnpair }) {
 
   return (
     <div className="fs" style={{ flexDirection: s.promotionSide === 'LEFT' ? 'row-reverse' : 'row', background: s.background ? `url(/api/public/media/${s.background}) center/cover` : undefined }}>
+      {!live && <div className="badge warning" role="status" style={{ position: 'fixed', top: 12, right: 12, zIndex: 20 }}>กำลังเชื่อมต่อ… · Connecting… · 连接中…</div>}
       {state.screen === 'IDLE' ? <div style={{ flex: 1, position: 'relative' }}>{promo}
         {!langChosen && <button type="button" onClick={() => setLocal({ kind: 'LANG' })} className="btn primary xl pill" style={{ position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)' }}>แตะเพื่อเริ่ม · Touch to start · 点击开始</button>}</div> : <>
         <div style={{ width: `${pct}%`, padding: '4vh 3vw', display: 'flex', flexDirection: 'column', gap: 16, background: 'var(--surface)', overflow: 'auto' }}>
@@ -171,7 +181,7 @@ export default function CustomerDisplay() {
   useEffect(() => { if (paired) load(); }, [paired, load]);
   if (!paired) return <Pair onPaired={() => setPaired(true)} />;
   if (!me) return <div className="fs"><div className="fs-center"><Loader2 size={60} style={{ animation: 'spin 1s linear infinite' }} /></div></div>;
-  return <I18nProvider storageKey={null} initial={me.settings.display.defaultLanguage}><DisplayScreen me={me} onUnpair={() => { localStorage.removeItem(KEY); setPaired(false); setMe(null); }} /></I18nProvider>;
+  return <I18nProvider storageKey={null} initial={me.settings.display.defaultLanguage}><DisplayScreen me={me} onUnpair={() => { closeSocket({ kind: 'display', token: localStorage.getItem(KEY) }); localStorage.removeItem(KEY); setPaired(false); setMe(null); }} /></I18nProvider>;
 }
 
 export { Input };

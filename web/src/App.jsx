@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ToastProvider, ConfirmProvider, Skeleton } from './components/ui.jsx';
 import { AuthProvider, useAuth } from './lib/auth.jsx';
 import Layout from './components/Layout.jsx';
+import { useAdminTranslation } from './lib/adminI18n.jsx';
 
 const L = (f) => lazy(f);
 // admin
@@ -62,6 +63,7 @@ function RequireStaff({ children }) {
 }
 
 function Admin() {
+  useAdminTranslation();
   return (
     <AuthProvider>
       <Suspense fallback={<Loading />}>

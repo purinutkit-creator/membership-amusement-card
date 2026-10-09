@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { AdminLangToggle } from '../lib/adminI18n.jsx';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Crown, ShoppingCart, Users, CreditCard, Wallet, ArrowLeftRight, Gamepad2, MonitorSmartphone, Stamp, Coins, Gift, Megaphone, Package,
@@ -174,6 +175,7 @@ export default function Layout() {
           <GlobalSearch />
           <div className="grow" />
           <span title={connected ? 'Realtime connected' : 'Realtime disconnected'}>{connected ? <Wifi size={18} color="var(--success)" /> : <WifiOff size={18} color="var(--danger)" />}</span>
+          <AdminLangToggle />
           <BranchSwitcher />
           <Notifications />
           <Button variant="ghost" icon={mode === 'dark' ? Sun : Moon} onClick={() => setMode(toggleMode(settings?.theme))} aria-label="Toggle dark mode" />
