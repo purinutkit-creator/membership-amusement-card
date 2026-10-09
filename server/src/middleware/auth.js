@@ -30,7 +30,8 @@ export async function attachContext(req, _res, next) {
           ctx.staff = staff;
           ctx.session = sess;
           ctx.sessionLocked = sess.locked;
-          ctx.branchId = req.headers['x-branch-id'] && (staff.is_owner || staff.permissions.has('branch.manage')) ? req.headers['x-branch-id'] : staff.branch_id;
+          const hdr = req.headers['x-branch-id'];
+          ctx.branchId = hdr && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(hdr) && (staff.is_owner || staff.permissions.has('branch.manage')) ? hdr : staff.branch_id;
           ctx.viaCookie = !!req.cookies?.[STAFF_COOKIE];
         }
       }

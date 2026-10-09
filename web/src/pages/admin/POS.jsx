@@ -30,6 +30,7 @@ export default function POS({ mode = 'full' }) {
   const [merchant, setMerchant] = useState('');
   const [discountOpen, setDiscountOpen] = useState(false);
   const [newCardOpen, setNewCardOpen] = useState(null);
+  const [dispScreen, setDispScreen] = useState(null); // explicit customer-display prompt (MEMBER_PROMPT / PHONE_INPUT / TAP_CARD / ERROR)
   const [run, busy] = useAction();
 
   const shift = useLoad(() => api.get('/shifts/current'), []);
@@ -41,14 +42,14 @@ export default function POS({ mode = 'full' }) {
   // ---------------------------------------------------------------- customer display sync
   const pairing = usePairing(async (e) => {
     if (e.type === 'PHONE') {
-      if (!e.found) { toast.warning(`Member not found for ${e.value}`); pairing.push({ ...displayState, screen: 'MEMBER_NOT_FOUND' }); return; }
+      if (!e.found) { toast.warning(`Member not found for ${e.value}`); setDispScreen('MEMBER_NOT_FOUND'); setTimeout(() => setDispScreen('PHONE_INPUT'), 2500); return; }
       const m = await api.get(`/members/${e.memberId}`);
       selectMember(m); toast.info(`Customer entered phone: ${m.firstName}`);
     } else if (e.type === 'CARD') {
       if (!e.cardId) { toast.error('CARD NOT FOUND'); return; }
       selectCard(await api.get(`/cards/${e.cardId}`));
     } else if (e.type === 'IS_MEMBER') {
-      if (e.value) pairing.push({ ...displayState, screen: 'PHONE_INPUT' }); else pairing.push({ ...displayState, screen: 'ORDER' });
+      setDispScreen(e.value ? 'PHONE_INPUT' : null);
     } else if (e.type === 'LANGUAGE') toast.info(`Customer chose ${String(e.value).toUpperCase()}`);
     else if (e.type === 'CONSENT') toast.success('Customer accepted privacy policy');
   });
@@ -56,13 +57,14 @@ export default function POS({ mode = 'full' }) {
   const lines = priced?.lines || [];
   const totals = priced?.totals;
   const displayState = useMemo(() => ({
-    screen: cart.length ? 'ORDER' : member || card ? 'CUSTOMER' : 'IDLE',
+    screen: dispScreen || (cart.length ? 'ORDER' : member || card ? 'CUSTOMER' : 'IDLE'),
     member: member ? { name: member.firstName, tier: member.tier?.name || null } : null,
     card: card ? { number: maskCard(card.cardNumber), balance: card.balance, points: card.points, stamps: card.stamps } : null,
     lines: lines.map((l) => ({ name: l.name, qty: l.qty, total: l.total, bonus: l.meta?.bonus || 0, newBalance: l.meta?.newBalance })),
     totals: totals && { subtotal: totals.subtotal, discount: totals.manualDiscount + totals.promoDiscount + totals.tierDiscount + totals.lineDiscounts, vat: totals.vat, service: totals.service, grandTotal: totals.grandTotal },
     promotions: priced?.promotions?.map((p) => p.name) || [],
-  }), [cart.length, member, card, lines, totals, priced]);
+    error: dispScreen === 'ERROR' ? 'CARD_MEMBER_MISMATCH' : undefined,
+  }), [cart.length, member, card, lines, totals, priced, dispScreen]);
   useEffect(() => { if (!order) pairing.push(displayState); }, [displayState, order]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ---------------------------------------------------------------- identification
@@ -70,18 +72,19 @@ export default function POS({ mode = 'full' }) {
     setMember(m);
     setPriceErr(null);
     if (card && card.member && card.member.id !== m.id) { setCard(null); toast.warning('Previous card does not belong to this member — scan the member card'); }
-    pairing.push({ ...displayState, screen: 'TAP_CARD', member: { name: m.firstName, tier: m.tier?.name } });
+    if (!card || (card.member && card.member.id !== m.id)) setDispScreen('TAP_CARD');
   };
   const selectCard = async (c) => {
     if (c.status === 'INACTIVE') { setNewCardOpen(c); return; }
     if (member && c.member?.id !== member.id) {
       play('error');
       toast.error('CARD DOES NOT BELONG TO MEMBER');
-      pairing.push({ ...displayState, screen: 'ERROR', error: 'CARD_MEMBER_MISMATCH' });
+      setDispScreen('ERROR'); setTimeout(() => setDispScreen('TAP_CARD'), 2500);
       return;
     }
     if (c.status !== 'ACTIVE') { toast.error(`CARD ${c.status}`); play('error'); }
     setCard(c);
+    setDispScreen(null);
     if (!member && c.member) setMember(await api.get(`/members/${c.member.id}`));
   };
   const lookupCard = async (ident) => {
@@ -114,7 +117,7 @@ export default function POS({ mode = 'full' }) {
   };
   const qty = (u, d) => setCart((c) => c.map((i) => (i.uid === u ? { ...i, qty: Math.max(1, i.qty + d) } : i)));
   const remove = (u) => setCart((c) => c.filter((i) => i.uid !== u));
-  const reset = () => { setCart([]); setMember(null); setCard(null); setDiscount(null); setPriced(null); setOrder(null); setPriceErr(null); pairing.push({ screen: 'IDLE' }); shift.reload(true); };
+  const reset = () => { setDispScreen(null); setCart([]); setMember(null); setCard(null); setDiscount(null); setPriced(null); setOrder(null); setPriceErr(null); pairing.push({ screen: 'IDLE' }); shift.reload(true); };
 
   const payload = useMemo(() => ({
     memberId: member?.id || null, cardId: card && !card.pendingIssue ? card.id : null, merchantId: merchant || null,
@@ -195,11 +198,11 @@ export default function POS({ mode = 'full' }) {
 
         <div className="pos-right">
           <div style={{ padding: 14, borderBottom: '1px solid var(--border)' }} className="col gap-s">
-            {member ? <MemberChip member={member} onClear={() => { setMember(null); setCard(null); setCart((c) => c.filter((i) => i.type === 'PRODUCT')); }} />
-              : <MemberLookup onMember={selectMember} onRegister={(phone) => setRegister({ phone })} paired={pairing.paired} onAskDisplay={() => pairing.push({ ...displayState, screen: displaySettings.memberPrompt === false ? 'PHONE_INPUT' : 'MEMBER_PROMPT' })} />}
+            {member ? <MemberChip member={member} onClear={() => { setDispScreen(null); setMember(null); setCard(null); setCart((c) => c.filter((i) => i.type === 'PRODUCT')); }} />
+              : <MemberLookup onMember={selectMember} onRegister={(phone) => setRegister({ phone })} paired={pairing.paired} onAskDisplay={() => setDispScreen(displaySettings.memberPrompt === false ? 'PHONE_INPUT' : 'MEMBER_PROMPT')} />}
             {card ? <CardChip card={card} onClear={() => { setCard(null); setCart((c) => c.filter((i) => i.type === 'PRODUCT')); }} />
               : <CardScanInput onCard={selectCard} size="" wedge={false} placeholder={member ? 'Tap / scan the MEMBER card' : 'Tap / scan card (optional)'} autoFocus={false} />}
-            {member && !card && pairing.paired && <Button size="sm" onClick={() => pairing.push({ ...displayState, screen: 'TAP_CARD' })}>Ask customer to tap card on display</Button>}
+            {member && !card && pairing.paired && <Button size="sm" onClick={() => setDispScreen('TAP_CARD')}>Ask customer to tap card on display</Button>}
           </div>
           <div className="cart-lines">
             {cart.length === 0 ? <Empty title="Cart is empty" icon={ShoppingCart} /> : cart.map((i) => {

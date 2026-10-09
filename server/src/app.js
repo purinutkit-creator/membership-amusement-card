@@ -43,7 +43,12 @@ export function createApp() {
     });
   }
   fs.mkdirSync(config.uploadDir, { recursive: true });
-  app.use('/uploads', express.static(config.uploadDir, { maxAge: '7d', setHeaders: (res) => res.setHeader('X-Content-Type-Options', 'nosniff') }));
+  // Uploaded files are untrusted: sandbox them so an SVG/HTML opened directly cannot run script.
+  app.use('/uploads', express.static(config.uploadDir, { maxAge: '7d', setHeaders: (res) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Content-Security-Policy', "sandbox; default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; media-src 'self'; font-src 'self' data:");
+    res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
+  } }));
   app.use('/api', attachContext, csrfGuard, apiRouter);
   app.use('/api', (_req, _res, next) => next(new AppError('NOT_FOUND', 'API route not found', 404)));
 

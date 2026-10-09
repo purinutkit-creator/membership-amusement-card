@@ -247,3 +247,4 @@ table.table { width: 100%; border-collapse: collapse; font-size: .9rem; }
   .grid.keep3 .card { padding: 10px; } .grid.keep3 .stat .value { font-size: 1.1rem; }
   .topbar { padding: 0 12px; gap: 8px; } .brand-name { display: none; }
 }
+.lang-btn { min-width: min(260px, 40vw); }
