@@ -3,9 +3,9 @@ import { Routes, Route, Navigate, NavLink, useNavigate, useParams, Link } from '
 import { Home, CreditCard, Gift, History, User, Wallet, Megaphone, Bell, LogOut, Loader2, CheckCircle2, FlaskConical, QrCode, RefreshCw, Coins, Stamp } from 'lucide-react';
 import { api } from '../../lib/api.js';
 import { useSocket } from '../../lib/realtime.js';
-import { I18nProvider, useI18n, LanguageSwitcher } from '../../lib/i18n.jsx';
+import { I18nProvider, useI18n, LanguageSwitcher, fmtDate } from '../../lib/i18n.jsx';
 import { applyPublicSettings } from '../../lib/auth.jsx';
-import { money, int, dt, date, TXN_LABEL } from '../../lib/format.js';
+import { money, int } from '../../lib/format.js';
 import { Button, Input, Select, Card, Badge, Empty, Chips, useToast, Modal, Spinner, useLoad } from '../../components/ui.jsx';
 import { DigitalCard, QR, mediaSrc } from '../../components/domain.jsx';
 
@@ -147,7 +147,7 @@ function HomePage() {
       <h1>{t('welcome')}, {me.nickname || me.firstName}</h1>
       <div className="row wrap small muted"><span>{t('portal.memberId')}: <code>{me.memberCode}</code></span>{me.tier && <Badge tone="primary">{t('tier')}: {me.tier.name}</Badge>}</div>
       {card ? <Link to={`/m/card/${card.id}`} style={{ color: 'inherit' }}><DigitalCard card={card} member={`${me.firstName} ${me.lastName}`} tier={me.tier} storeName={settings?.general?.storeName} showCodes={false} /></Link> : <div className="alert warning">{t('portal.noCard')}</div>}
-      <div className="grid g3"><Card><div className="stat"><span className="label">{t('balance')}</span><span className="value">{money(me.balance)}</span></div></Card>
+      <div className="grid g3 keep3"><Card><div className="stat"><span className="label">{t('balance')}</span><span className="value">{money(me.balance)}</span></div></Card>
         <Card><div className="stat"><span className="label"><Coins size={14} /> {t('points')}</span><span className="value">{int(me.points)}</span></div></Card>
         <Card><div className="stat"><span className="label"><Stamp size={14} /> {settings?.stamp?.name || t('stamps')}</span><span className="value">{int(me.stamps)}</span></div></Card></div>
       {me.nextTier && progress != null && <Card><div className="small">{t('portal.nextTier', { tier: me.nextTier.name })}</div><div style={{ height: 10, background: 'var(--surface-2)', borderRadius: 99, marginTop: 8 }}><div style={{ width: `${progress}%`, height: '100%', background: 'var(--primary)', borderRadius: 99 }} /></div></Card>}
@@ -161,7 +161,8 @@ function HomePage() {
 }
 
 function CardsPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const date = (d) => fmtDate(lang, d, false);
   const { me } = useMember();
   const { id } = useParams();
   const nav = useNavigate();
@@ -228,7 +229,8 @@ function TopUpPage() {
 }
 
 function RewardsPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const dt = (d) => fmtDate(lang, d);
   const { me, refresh } = useMember();
   const toast = useToast();
   const cards = me.cards.filter((c) => c.status === 'ACTIVE');
@@ -269,7 +271,7 @@ function RewardsPage() {
 
 const HFILTERS = [['', 'portal.all'], ['topup', 'topup'], ['play', 'portal.play'], ['point', 'points'], ['stamp', 'stamps'], ['reward', 'portal.rewards'], ['refund', 'portal.refund'], ['adjustment', 'portal.adjustment']];
 function HistoryPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { me } = useMember();
   const [type, setType] = useState('');
   const [page, setPage] = useState(1);
@@ -282,7 +284,7 @@ function HistoryPage() {
         const amt = Number(x.amount) + Number(x.bonus);
         return (
           <div key={x.id} className="card tight row between">
-            <div><b>{TXN_LABEL[x.type] || x.type}</b>{x.machine_name && <span className="muted"> · {x.machine_name}</span>}<div className="xs muted">{dt(x.created_at)} · ••{x.card_number.slice(-4)}</div></div>
+            <div><b>{t(`txn.${x.type}`)}</b>{x.machine_name && <span className="muted"> · {x.machine_name}</span>}<div className="xs muted">{fmtDate(lang, x.created_at)} · ••{x.card_number.slice(-4)}</div></div>
             <div className="right">{amt !== 0 && <div className={`bold num ${amt < 0 ? 'danger' : 'success'}`}>{amt > 0 ? '+' : ''}{money(amt)}</div>}
               <div className="xs">{x.points_delta !== 0 && `${x.points_delta > 0 ? '+' : ''}${x.points_delta} ${t('points')} `}{x.stamps_delta !== 0 && `${x.stamps_delta > 0 ? '+' : ''}${x.stamps_delta} ${t('stamps')}`}</div></div>
           </div>);
@@ -293,14 +295,16 @@ function HistoryPage() {
 }
 
 function PromotionsPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const date = (d) => fmtDate(lang, d, false);
   const st = useLoad(() => api.get('/member/promotions'), []);
   return <div className="col"><h1>{t('promotions')}</h1>{!st.data?.items.length ? <Empty title={t('portal.empty')} /> : st.data.items.map((p) => (
     <Card key={p.id}>{p.media_id && <img src={mediaSrc(p.media_id)} alt="" style={{ width: '100%', borderRadius: 10, marginBottom: 8 }} />}<b className="big">{p.name}</b><div>{p.description}</div><div className="xs muted">{p.start_at && date(p.start_at)} – {p.end_at && date(p.end_at)}</div></Card>))}</div>;
 }
 
 function NotificationsPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const dt = (d) => fmtDate(lang, d);
   const st = useLoad(() => api.get('/member/notifications'), []);
   useEffect(() => { api.post('/member/notifications/read', {}, { approval: false }).catch(() => {}); }, []);
   return <div className="col"><h1>{t('portal.notifications')}</h1>{!st.data?.items.length ? <Empty title={t('portal.empty')} /> : st.data.items.map((n) => <Card key={n.id}><b>{n.title}</b>{n.body && <div className="small">{n.body}</div>}<div className="xs muted">{dt(n.created_at)}</div></Card>)}</div>;
@@ -308,6 +312,7 @@ function NotificationsPage() {
 
 function ProfilePage() {
   const { t, lang } = useI18n();
+  const date = (d) => fmtDate(lang, d, false);
   const { me, refresh, settings } = useMember();
   const toast = useToast();
   const nav = useNavigate();

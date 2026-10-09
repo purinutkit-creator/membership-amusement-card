@@ -6,6 +6,7 @@ import { EntityPage } from '../../components/entity.jsx';
 import { Button, Badge, Card, Modal, Input, useToast, useLoad } from '../../components/ui.jsx';
 import { ReceiptView } from '../../components/domain.jsx';
 import { dt } from '../../lib/format.js';
+import { useAuth } from '../../lib/auth.jsx';
 
 const SAMPLE = {
   store: { name: 'Sample Store', address: '99 Sample Rd', phone: '02-000-0000', taxId: '0105550000001' }, receiptNo: 'RCP202601010001', createdAt: new Date().toISOString(), cashier: 'Demo', orderNo: 'ORD202601010001', type: 'SALE',
@@ -58,6 +59,7 @@ export function PrinterList() {
 }
 
 export default function Printers() {
-  const s = useLoad(() => api.get('/settings/receipt').catch(() => null), []);
-  return <div className="col"><PrinterList />{s.data && <Card><div className="small">Receipt layout & content: Settings → Receipt (paper {s.data.value.paperWidth}, {s.data.value.copies} copies, auto print {s.data.value.autoPrint ? 'on' : 'off'}).</div></Card>}</div>;
+  const { settings } = useAuth();
+  const r = settings?.receipt;
+  return <div className="col"><PrinterList />{r && <Card><div className="small">Receipt layout & content: Settings → Receipt (paper {r.paperWidth}, {r.copies} copies, auto print {r.autoPrint ? 'on' : 'off'}).</div></Card>}</div>;
 }

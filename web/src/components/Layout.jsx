@@ -60,7 +60,7 @@ function GlobalSearch() {
     nav(map[r.kind]); setQ(''); setOpen(false);
   };
   return (
-    <div className="search-box">
+    <div className="search-box hide-mobile">
       <Search size={18} />
       <input className="input" placeholder="Search member, phone, card, transaction, receipt, reward, machine…" value={q} onChange={(e) => { setQ(e.target.value); setOpen(true); }}
         onFocus={() => setOpen(true)} onBlur={() => setTimeout(() => setOpen(false), 200)}

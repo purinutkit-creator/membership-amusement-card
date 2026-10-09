@@ -92,13 +92,14 @@ export function DisplayControl({ pairing }) {
   );
 }
 
-export function ShiftBar({ shift, reload }) {
+export function ShiftBar({ shift, reload, loading }) {
   const { can } = useAuth();
   const [mode, setMode] = useState(null);
   const [amount, setAmount] = useState('');
   const [reason, setReason] = useState('');
   const [run, busy] = useAction();
   const close = () => { setMode(null); setAmount(''); setReason(''); };
+  if (loading && !shift) return null;
   if (!shift) {
     return (
       <div className="alert warning row between"><span><Clock size={16} /> No open shift. Open a cashier shift to take payments.</span>

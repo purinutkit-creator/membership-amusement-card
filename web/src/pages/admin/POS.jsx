@@ -144,7 +144,7 @@ export default function POS({ mode = 'full' }) {
     <div className="col" style={{ gap: 10 }}>
       <div className="row between wrap no-print">
         <h1 style={{ margin: 0 }}>{mode === 'topup' ? 'Top Up' : 'POS / Cashier'}</h1>
-        <div className="row wrap"><ShiftBar shift={shift.data} reload={() => shift.reload(true)} />{settings?.general?.modules?.customerDisplay !== false && <DisplayControl pairing={pairing} />}</div>
+        <div className="row wrap"><ShiftBar shift={shift.data} loading={shift.loading} reload={() => shift.reload(true)} />{settings?.general?.modules?.customerDisplay !== false && <DisplayControl pairing={pairing} />}</div>
       </div>
       {mode === 'topup' && <div className="steps">{['Identify member', 'Tap / scan card', 'Package / amount', 'Payment', 'Receipt'].map((s, i) => <span key={s} className={`step ${i === step ? 'active' : i < step ? 'done' : ''}`}>{i < step ? <Check size={14} /> : i + 1}. {s}</span>)}</div>}
       <div className="pos">

@@ -1,4 +1,4 @@
-import { Fragment, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useId, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { AlertTriangle, CheckCircle2, Info, X, XCircle, Inbox, RefreshCw, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { api } from '../lib/api.js';
 import { STATUS_TONE } from '../lib/format.js';
@@ -86,19 +86,22 @@ export function Button({ children, icon: Icon, loading, variant, size, block, cl
   );
 }
 
-export function Field({ label, hint, error, children, className = '' }) {
-  return <div className={`field ${className}`}>{label && <label>{label}</label>}{children}{error ? <span className="err">{error}</span> : hint ? <span className="hint">{hint}</span> : null}</div>;
+export function Field({ label, hint, error, children, className = '', htmlFor }) {
+  return <div className={`field ${className}`}>{label && <label htmlFor={htmlFor}>{label}</label>}{children}{error ? <span className="err">{error}</span> : hint ? <span className="hint">{hint}</span> : null}</div>;
 }
 export function Input({ label, hint, error, className = '', size, ...p }) {
-  return <Field label={label} hint={hint} error={error} className={className}><input className={`input ${size || ''} ${error ? 'invalid' : ''}`} {...p} /></Field>;
+  const auto = useId(); const id = p.id || auto;
+  return <Field label={label} hint={hint} error={error} className={className} htmlFor={id}><input id={id} className={`input ${size || ''} ${error ? 'invalid' : ''}`} {...p} /></Field>;
 }
 export function Textarea({ label, hint, className = '', ...p }) {
-  return <Field label={label} hint={hint} className={className}><textarea className="input" {...p} /></Field>;
+  const auto = useId(); const id = p.id || auto;
+  return <Field label={label} hint={hint} className={className} htmlFor={id}><textarea id={id} className="input" {...p} /></Field>;
 }
 export function Select({ label, hint, options = [], placeholder, className = '', ...p }) {
+  const auto = useId(); const id = p.id || auto;
   return (
-    <Field label={label} hint={hint} className={className}>
-      <select className="input" {...p}>
+    <Field label={label} hint={hint} className={className} htmlFor={id}>
+      <select id={id} className="input" {...p}>
         {placeholder !== undefined && <option value="">{placeholder}</option>}
         {options.map((o) => (typeof o === 'string' ? <option key={o} value={o}>{o}</option> : <option key={o.value} value={o.value}>{o.label}</option>))}
       </select>

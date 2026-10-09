@@ -12,7 +12,7 @@ export function LabelSheet({ cards, layout = 'sheet' }) {
   return (
     <div id="label-print" className={layout === 'sheet' ? 'label-sheet' : ''} style={{ background: '#fff' }}>
       {cards.map((c) => (
-        <div key={c.card_number} className={`label ${layout === 'thermal' ? 'thermal' : ''}`}>
+        <div key={c.card_number} className={`lbl ${layout === "thermal" ? "thermal" : ""}`}>
           <Barcode value={c.card_number} height={34} width={1.3} displayValue={false} />
           <div className="mono" style={{ fontSize: '9pt' }}>{groupCard(c.card_number)}</div>
           {c.portalUrl && <QR value={c.portalUrl} size={56} />}
@@ -91,7 +91,7 @@ export default function Cards() {
           <select className="input" value={type} onChange={(e) => setType(e.target.value)}><option value="">All types</option><option value="MEMBER">Member</option><option value="GUEST">Guest</option></select>
         </div>
         <PagedTable state={st} onRowClick={(r) => nav(`/cards/${r.id}`)} columns={[
-          { label: 'Card number', render: (r) => <span className="mono bold">{groupCard(r.card_number)}</span> }, { key: 'card_type', label: 'Type' },
+          { label: 'Card number', render: (r) => <span className="mono bold nowrap">{groupCard(r.card_number)}</span> }, { key: 'card_type', label: 'Type' },
           { label: 'Member', render: (r) => (r.member_code ? `${r.first_name} ${r.last_name} (${r.member_code})` : <span className="faint">—</span>) },
           { label: 'Balance', num: true, render: (r) => money(r.balance) }, { label: 'Points', num: true, render: (r) => int(r.points) }, { label: 'Stamps', num: true, render: (r) => int(r.stamps) },
           { label: 'Last used', render: (r) => dt(r.last_used_at) }, { label: 'Batch', render: (r) => r.batch_no && <code className="xs">{r.batch_no}</code> }, { label: 'Status', render: (r) => <StatusBadge status={r.status} /> },

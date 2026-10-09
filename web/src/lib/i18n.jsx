@@ -10,6 +10,7 @@ export const LANGS = [
 
 const dict = {
   th: {
+    'txn.TOP_UP': 'เติมเงิน', 'txn.PLAY': 'เล่นเกม', 'txn.FOOD_PURCHASE': 'ซื้ออาหาร', 'txn.PURCHASE': 'ซื้อสินค้า', 'txn.REFUND': 'คืนเงิน', 'txn.BALANCE_ADJUSTMENT': 'ปรับยอดเงิน', 'txn.STAMP_ADD': 'ได้รับแสตมป์', 'txn.STAMP_REMOVE': 'หักแสตมป์', 'txn.POINT_ADD': 'ได้รับคะแนน', 'txn.POINT_REMOVE': 'หักคะแนน', 'txn.REWARD_REDEMPTION': 'แลกของรางวัล', 'txn.REDEMPTION_CANCEL': 'ยกเลิกการแลก', 'txn.CARD_DEPOSIT': 'ค่ามัดจำบัตร', 'txn.DEPOSIT_REFUND': 'คืนค่ามัดจำ', 'txn.CARD_TRANSFER_OUT': 'โอนยอดออก', 'txn.CARD_TRANSFER_IN': 'โอนยอดเข้า', 'txn.PROMOTION_BONUS': 'โบนัสโปรโมชั่น', 'txn.STAMP_CONVERT': 'แลกแสตมป์เป็นคะแนน', 'txn.BALANCE_EXPIRE': 'ยอดเงินหมดอายุ', 'txn.POINT_EXPIRE': 'คะแนนหมดอายุ', 'txn.STAMP_EXPIRE': 'แสตมป์หมดอายุ', 'txn.REVERSAL': 'รายการกลับรายการ',
     'lang.select': 'เลือกภาษา', welcome: 'ยินดีต้อนรับ', 'welcome.to': 'ยินดีต้อนรับสู่ {store}',
     'member.ask': 'คุณเป็นสมาชิกหรือไม่?', yes: 'ใช่', no: 'ไม่ใช่', back: 'ย้อนกลับ', next: 'ถัดไป', confirm: 'ยืนยัน', cancel: 'ยกเลิก', close: 'ปิด', clear: 'ล้าง', done: 'เสร็จสิ้น', retry: 'ลองใหม่', loading: 'กำลังโหลด…', save: 'บันทึก',
     'phone.enter': 'กรอกเบอร์โทรศัพท์', 'phone.label': 'เบอร์โทรศัพท์', 'member.found': 'พบข้อมูลสมาชิก', 'member.notFound': 'ไม่พบสมาชิก', 'member.hello': 'สวัสดีคุณ {name}',
@@ -33,6 +34,7 @@ const dict = {
     'portal.contactStaff': 'กรุณาติดต่อพนักงานเพื่อรีเซ็ต PIN', 'portal.otpSent': 'ส่งรหัส OTP แล้ว', 'portal.otp': 'รหัส OTP', 'portal.quick': 'เมนูด่วน', 'portal.digitalCard': 'บัตรดิจิทัล', 'portal.receipt': 'ใบเสร็จ',
   },
   en: {
+    'txn.TOP_UP': 'Top Up', 'txn.PLAY': 'Play', 'txn.FOOD_PURCHASE': 'Food', 'txn.PURCHASE': 'Purchase', 'txn.REFUND': 'Refund', 'txn.BALANCE_ADJUSTMENT': 'Balance adjustment', 'txn.STAMP_ADD': 'Stamps added', 'txn.STAMP_REMOVE': 'Stamps removed', 'txn.POINT_ADD': 'Points added', 'txn.POINT_REMOVE': 'Points removed', 'txn.REWARD_REDEMPTION': 'Reward redeemed', 'txn.REDEMPTION_CANCEL': 'Redemption cancelled', 'txn.CARD_DEPOSIT': 'Card deposit', 'txn.DEPOSIT_REFUND': 'Deposit refund', 'txn.CARD_TRANSFER_OUT': 'Transfer out', 'txn.CARD_TRANSFER_IN': 'Transfer in', 'txn.PROMOTION_BONUS': 'Promotion bonus', 'txn.STAMP_CONVERT': 'Stamps → points', 'txn.BALANCE_EXPIRE': 'Balance expired', 'txn.POINT_EXPIRE': 'Points expired', 'txn.STAMP_EXPIRE': 'Stamps expired', 'txn.REVERSAL': 'Reversal',
     'lang.select': 'Select language', welcome: 'Welcome', 'welcome.to': 'Welcome to {store}',
     'member.ask': 'Are you a member?', yes: 'Yes', no: 'No', back: 'Back', next: 'Next', confirm: 'Confirm', cancel: 'Cancel', close: 'Close', clear: 'Clear', done: 'Done', retry: 'Try again', loading: 'Loading…', save: 'Save',
     'phone.enter': 'Enter your phone number', 'phone.label': 'Phone number', 'member.found': 'Member found', 'member.notFound': 'Member not found', 'member.hello': 'Hello, {name}',
@@ -55,6 +57,7 @@ const dict = {
     'portal.contactStaff': 'Please contact our staff to reset your PIN', 'portal.otpSent': 'OTP code sent', 'portal.otp': 'OTP code', 'portal.quick': 'Quick actions', 'portal.digitalCard': 'Digital card', 'portal.receipt': 'Receipt',
   },
   zh: {
+    'txn.TOP_UP': '充值', 'txn.PLAY': '游戏', 'txn.FOOD_PURCHASE': '餐饮', 'txn.PURCHASE': '购物', 'txn.REFUND': '退款', 'txn.BALANCE_ADJUSTMENT': '余额调整', 'txn.STAMP_ADD': '获得印章', 'txn.STAMP_REMOVE': '扣除印章', 'txn.POINT_ADD': '获得积分', 'txn.POINT_REMOVE': '扣除积分', 'txn.REWARD_REDEMPTION': '兑换奖品', 'txn.REDEMPTION_CANCEL': '取消兑换', 'txn.CARD_DEPOSIT': '押金', 'txn.DEPOSIT_REFUND': '退还押金', 'txn.CARD_TRANSFER_OUT': '转出', 'txn.CARD_TRANSFER_IN': '转入', 'txn.PROMOTION_BONUS': '促销赠送', 'txn.STAMP_CONVERT': '印章换积分', 'txn.BALANCE_EXPIRE': '余额过期', 'txn.POINT_EXPIRE': '积分过期', 'txn.STAMP_EXPIRE': '印章过期', 'txn.REVERSAL': '冲正',
     'lang.select': '选择语言', welcome: '欢迎', 'welcome.to': '欢迎光临 {store}',
     'member.ask': '您是会员吗？', yes: '是', no: '否', back: '返回', next: '下一步', confirm: '确认', cancel: '取消', close: '关闭', clear: '清除', done: '完成', retry: '重试', loading: '加载中…', save: '保存',
     'phone.enter': '请输入手机号码', 'phone.label': '手机号码', 'member.found': '已找到会员', 'member.notFound': '未找到会员', 'member.hello': '您好，{name}',
@@ -77,6 +80,13 @@ const dict = {
     'portal.contactStaff': '请联系工作人员重置PIN码', 'portal.otpSent': '验证码已发送', 'portal.otp': '验证码', 'portal.quick': '快捷功能', 'portal.digitalCard': '电子会员卡', 'portal.receipt': '收据',
   },
 };
+
+const LOCALES = { th: 'th-TH', en: 'en-GB', zh: 'zh-CN' };
+/** Locale-aware date/time for customer screens. */
+export function fmtDate(lang, d, withTime = true) {
+  if (!d) return '—';
+  return new Date(String(d).length === 10 ? `${d}T00:00:00` : d).toLocaleString(LOCALES[lang] || 'en-GB', withTime ? { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' } : { day: 'numeric', month: 'short', year: 'numeric' });
+}
 
 export const ERROR_KEY = {
   INSUFFICIENT_BALANCE: 'err.insufficient', CARD_NOT_FOUND: 'err.cardNotFound', CARD_BLOCKED: 'err.cardBlocked', CARD_EXPIRED: 'err.cardExpired', CARD_LOST: 'err.cardLost',

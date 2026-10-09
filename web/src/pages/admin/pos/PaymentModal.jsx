@@ -21,7 +21,7 @@ function Countdown({ until }) {
 export function ReceiptPanel({ receiptId, onClose }) {
   const { settings, can } = useAuth();
   const st = useLoad(() => api.get(`/receipts/${receiptId}`), [receiptId]);
-  const rs = useLoad(() => api.get('/settings/receipt').then((r) => r.value).catch(() => ({})), []);
+  const rs = { data: settings?.receipt || {} };
   const [run, busy] = useAction();
   const [email, setEmail] = useState('');
   const toast = useToast();

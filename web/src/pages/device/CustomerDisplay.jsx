@@ -123,7 +123,7 @@ function DisplayScreen({ me, onUnpair }) {
         <div style={{ width: `${pct}%`, padding: '4vh 3vw', display: 'flex', flexDirection: 'column', gap: 16, background: 'var(--surface)', overflow: 'auto' }}>
           <div className="row between"><div className="huge">{me.settings.storeName}</div><div className="chips">{LANGS.map((l) => <button key={l.code} className={`chip ${lang === l.code ? 'active' : ''}`} onClick={() => { setLang(l.code); send('LANGUAGE', l.code); }}>{l.code.toUpperCase()}</button>)}</div></div>
           {state.member && <div className="card row"><UserRound /><div className="big">{t('member.hello', { name: state.member.name })}</div>{state.member.tier && <span className="badge primary">{state.member.tier}</span>}</div>}
-          {state.card && <div className="card row between"><span className="row"><CreditCard /><span className="mono big">{state.card.number}</span></span><span><span className="muted">{t('currentBalance')} </span><b className="big num">{money(state.card.balance)}</b></span></div>}
+          {state.card && <div className="card row between"><span className="row"><CreditCard /><span className="mono big nowrap">{state.card.number}</span></span><span><span className="muted">{t('currentBalance')} </span><b className="big num">{money(state.card.balance)}</b></span></div>}
           {state.screen === 'PAYMENT' ? (
             <div className="card center col" style={{ alignItems: 'center', flex: 1, justifyContent: 'center' }}>
               <div className="big">{t('pay.scan')} · {t('pay.promptpay')}</div>
@@ -139,7 +139,7 @@ function DisplayScreen({ me, onUnpair }) {
             </div>
             {state.totals && <div className="card col">{state.totals.discount > 0 && <div className="row between"><span>{t('discount')}</span><span className="num">-{money(state.totals.discount)}</span></div>}
               {state.totals.vat > 0 && <div className="row between small muted"><span>{t('vat')}</span><span className="num">{money(state.totals.vat)}</span></div>}
-              <div className="row between"><span className="huge">{t('total')}</span><span className="giant num">{money(state.totals.grandTotal)}</span></div></div>}
+              <div className="row between"><span className="huge">{t("total")}</span><span className="huge num" style={{ fontSize: "clamp(2rem, 5vw, 4rem)" }}>{money(state.totals.grandTotal)}</span></div></div>}
           </> : <div className="fs-center" style={{ position: 'static' }}><div className="huge">{t('welcome.to', { store: me.settings.storeName })}</div></div>}
         </div>
         {pct < 100 && <div style={{ flex: 1, minWidth: 0 }}>{promo}</div>}
