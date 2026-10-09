@@ -9,7 +9,13 @@ pg.types.setTypeParser(20, (v) => (v === null ? null : Number(v)));
 // DATE -> keep as 'YYYY-MM-DD' string (no timezone shifting)
 pg.types.setTypeParser(1082, (v) => v);
 
-export const pool = new pg.Pool({ connectionString: config.databaseUrl, max: Number(process.env.DB_POOL_MAX || 20) });
+// Managed hosts' external URLs (e.g. *.render.com) require TLS; internal URLs and local DBs do not.
+const needsSsl = process.env.DB_SSL ? process.env.DB_SSL === 'true' : /\.render\.com[:/]/.test(config.databaseUrl);
+export const pool = new pg.Pool({
+  connectionString: config.databaseUrl,
+  max: Number(process.env.DB_POOL_MAX || 20),
+  ...(needsSsl ? { ssl: { rejectUnauthorized: false } } : {}),
+});
 pool.on('error', (err) => logger.error('db.pool_error', { message: err.message }));
 
 export function query(text, params) {

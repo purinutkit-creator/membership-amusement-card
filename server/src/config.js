@@ -36,3 +36,7 @@ export const config = {
   },
   machineController: process.env.MACHINE_CONTROLLER || 'socket',
 };
+
+if (config.isProd && !process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL is required in production (use your Postgres internal connection string)');
+}
