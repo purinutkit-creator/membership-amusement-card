@@ -83,7 +83,7 @@ function TerminalScreen({ info, onRevoked, onReload }) {
     setState({ screen: 'PROCESSING' });
     try {
       // The tap API answers rejections with {ok:false,result,...}; only server-confirmed APPROVED shows success.
-      const res = await fetch('/api/tap', { method: 'POST', headers: { 'content-type': 'application/json', authorization: `Device ${getToken()}` },
+      const res = await fetch('/api/tap', { method: 'POST', headers: { 'content-type': 'application/json', 'x-requested-with': 'smartcard', authorization: `Device ${getToken()}` },
         body: JSON.stringify({ machineId: m.id, cardIdentifier: v, requestId: crypto.randomUUID(), timestamp: new Date().toISOString(), deviceId: info.device.id }) });
       const r = await res.json().catch(() => ({}));
       if (res.status === 401 || res.status === 403 && r.error?.code === 'DEVICE_BLOCKED') { onRevoked(); return; }

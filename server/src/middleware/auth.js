@@ -113,6 +113,9 @@ export function permAny(...codes) {
  */
 export function csrfGuard(req, _res, next) {
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
+  // An Authorization header (device / display token) can't be attached cross-site without a CORS preflight,
+  // so such requests are already CSRF-safe, even when a staff cookie happens to share the browser.
+  if (req.headers.authorization) return next();
   const usesCookie = req.cookies?.[STAFF_COOKIE] || req.cookies?.[MEMBER_COOKIE];
   if (usesCookie && req.headers['x-requested-with'] !== 'smartcard') return next(fail('FORBIDDEN', 'CSRF check failed'));
   next();

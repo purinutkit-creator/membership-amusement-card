@@ -321,3 +321,15 @@ test('Shift close computes expected cash and over/short', async () => {
   assert.equal(close.status, 200, JSON.stringify(close.data));
   assert.equal(close.data.shift.over_short, -10);
 });
+
+test('Terminal tap works in a browser that also holds a staff session cookie (no CSRF false positive)', async () => {
+  const c = deviceClient(srv.base, fx.deviceTokens[4] || fx.deviceTokens[1]);
+  c.cookies = { ...cashier.cookies };
+  const machine = fx.deviceTokens[4] ? fx.machines[4] : fx.machines[1];
+  const r = await c.req('POST', '/tap', { machineId: machine.id, cardIdentifier: S.card.cardNumber, requestId: rid() }, { 'x-requested-with': '' });
+  assert.notEqual(r.status, 403, JSON.stringify(r.data));
+  assert.ok(['APPROVED', 'DUPLICATE_TAP', 'INSUFFICIENT_BALANCE'].includes(r.data.result), JSON.stringify(r.data));
+  // a cookie-only state change without the header is still refused
+  const bad = await cashier.req('POST', '/shifts/cash', { type: 'CASH_IN', amount: 1, reason: 'csrf probe' }, { 'x-requested-with': '' });
+  assert.equal(bad.status, 403);
+});
