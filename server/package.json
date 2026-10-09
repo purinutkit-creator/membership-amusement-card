@@ -1,0 +1,27 @@
+{
+  "name": "smartcard-server",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "migrate": "node src/db/migrate.js",
+    "seed": "node src/db/seed.js",
+    "test": "node --test --test-concurrency=1 test/"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.133.0",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^18.0.7",
+    "exceljs": "^4.4.0",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.1",
+    "helmet": "^8.3.0",
+    "multer": "^2.4.0",
+    "pg": "^8.23.1",
+    "socket.io": "^4.8.4",
+    "zod": "^4.6.5"
+  }
+}
